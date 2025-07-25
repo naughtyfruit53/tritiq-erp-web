@@ -1,0 +1,57 @@
+# Python/Bytecode
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+
+# Environment/Secrets
+.env
+*.env
+secrets/
+
+# Logs
+*.log
+logs/
+
+# Databases/Temp
+*.db
+*.sqlite3
+*.pid
+*.seed
+
+# Alembic Migrations (ignore generated versions if you regenerate them often)
+alembic.ini
+src/db/migrations/versions/
+
+# VS Code/IDE
+.vscode/
+.idea/
+
+# System/OS Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Dependencies/Builds
+venv/
+virtualenv/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Testing/Coverage
+.coverage
+coverage.xml
+*.cover
+.pytest_cache/
+htmlcov/
+
+# Project-Specific Temp/Backups
+*.bak
+*.swp
+*.swo
+*.tmp
+backup/
