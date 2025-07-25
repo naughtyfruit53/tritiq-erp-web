@@ -1,0 +1,30 @@
+<h2>GRNs</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>GRN Number</th>
+      <th>PO Number</th>
+      <th>Date</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for grn in grns %}
+    <tr>
+      <td>{{ grn.id }}</td>
+      <td>{{ grn.grn_number }}</td>
+      <td>{{ grn.po_id }}</td>
+      <td>{{ grn.created_at }}</td>
+      <td>{{ grn.status }}</td>
+      <td>
+        <a href="/grn/{{ grn.id }}/edit">Edit</a>
+        <a href="/grn/{{ grn.id }}/delete">Delete</a>
+        <a href="/grn/{{ grn.id }}/pdf">PDF</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a href="/grn/create">Create GRN</a>

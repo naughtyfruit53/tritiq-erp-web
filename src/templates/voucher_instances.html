@@ -1,0 +1,29 @@
+<!-- src/templates/voucher_instances.html -->
+{% extends "base.html" %}
+{% block title %}Voucher Instances{% endblock %}
+{% block content %}
+<h2>Voucher Instances</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Voucher Type ID</th>
+      <th>Voucher Number</th>
+      <th>Module Name</th>
+      <th>Created At</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for voucher in voucher_instances %}
+    <tr>
+      <td>{{ voucher.id }}</td>
+      <td>{{ voucher.voucher_type_id }}</td>
+      <td>{{ voucher.voucher_number }}</td>
+      <td>{{ voucher.module_name }}</td>
+      <td>{{ voucher.created_at }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a href="/api/v1/voucher_instances/create" class="btn btn-primary">Create Voucher Instance</a>
+{% endblock %}

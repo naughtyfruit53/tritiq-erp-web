@@ -1,0 +1,32 @@
+<!-- src/templates/users.html -->
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<h2>Users</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Active</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.role }}</td>
+            <td>{{ user.active }}</td>
+            <td>
+                <a href="/edit_user/{{ user.id }}" class="btn btn-sm btn-primary">Edit</a>
+                <a href="/delete_user/{{ user.id }}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="/add_user" class="btn btn-success">Add User</a>
+{% endblock %}

@@ -1,0 +1,34 @@
+<!-- src/templates/vendors.html -->
+{% extends "base.html" %}
+{% block title %}Vendors{% endblock %}
+{% block content %}
+<h2>Vendors</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for vendor in vendors %}
+        <tr>
+            <td>{{ vendor.id }}</td>
+            <td>{{ vendor.name }}</td>
+            <td>{{ vendor.contact_no }}</td>
+            <td>{{ vendor.city }}</td>
+            <td>{{ vendor.state }}</td>
+            <td>
+                <a href="/edit_vendor/{{ vendor.id }}" class="btn btn-sm btn-primary">Edit</a>
+                <a href="/delete_vendor/{{ vendor.id }}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="/add_vendor" class="btn btn-success">Add Vendor</a>
+{% endblock %}

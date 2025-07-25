@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Customer</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <h1>Add Customer</h1>
+    <form action="/customers" method="post">
+        <label for="name">Name*:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="contact_no">Contact No*:</label>
+        <input type="text" id="contact_no" name="contact_no" required><br><br>
+
+        <label for="address1">Address Line 1:</label>
+        <input type="text" id="address1" name="address1"><br><br>
+
+        <label for="address2">Address Line 2:</label>
+        <input type="text" id="address2" name="address2"><br><br>
+
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city"><br><br>
+
+        <label for="state">State:</label>
+        <input type="text" id="state" name="state"><br><br>
+
+        <label for="state_code">State Code:</label>
+        <input type="text" id="state_code" name="state_code"><br><br>
+
+        <label for="pin">PIN:</label>
+        <input type="text" id="pin" name="pin"><br><br>
+
+        <label for="gst_no">GST No:</label>
+        <input type="text" id="gst_no" name="gst_no"><br><br>
+
+        <label for="pan_no">PAN No:</label>
+        <input type="text" id="pan_no" name="pan_no"><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email"><br><br>
+
+        <button type="submit">Save</button>
+        <button type="button" onclick="window.location.href='/customers'">Cancel</button>
+    </form>
+</body>
+</html>

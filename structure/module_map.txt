@@ -1,0 +1,150 @@
+src/
+│   ├── config.py
+│   ├── main.py
+│   ├── api/
+│   │   ├── v1/
+│   │   │   ├── __init__.py
+│   │   │   ├── crm/
+│   │   │   │   ├── contacts.py
+│   │   │   │   ├── follow_ups.py
+│   │   │   │   ├── leads.py
+│   │   │   │   ├── placeholders.py
+│   │   │   │   ├── tickets.py
+│   │   │   │   ├── __init__.py
+│   │   │   ├── erp/
+│   │   │   │   ├── backup.py
+│   │   │   │   ├── company_details.py
+│   │   │   │   ├── credit_notes.py
+│   │   │   │   ├── customers.py
+│   │   │   │   ├── delivery_challan.py
+│   │   │   │   ├── grn.py
+│   │   │   │   ├── manufacturing.py
+│   │   │   │   ├── material_transaction.py
+│   │   │   │   ├── pending.py
+│   │   │   │   ├── products.py
+│   │   │   │   ├── proforma_invoices.py
+│   │   │   │   ├── purchase_inv.py
+│   │   │   │   ├── purchase_orders.py
+│   │   │   │   ├── quotations.py
+│   │   │   │   ├── rejections.py
+│   │   │   │   ├── sales_invoices.py
+│   │   │   │   ├── sales_orders.py
+│   │   │   │   ├── stock.py
+│   │   │   │   ├── users.py
+│   │   │   │   ├── vendors.py
+│   │   │   │   ├── voucher_columns.py
+│   │   │   │   ├── voucher_management.py
+│   │   │   │   ├── voucher_types.py
+│   │   │   │   ├── _init_.py
+│   │   │   ├── services/
+│   │   │   │   ├── auth.py
+│   │   │   │   ├── pdf.py
+│   │   │   │   ├── sequence.py
+│   │   │   │   ├── utils.py
+│   │   │   │   ├── _init_.py
+│   ├── core/
+│   │   ├── _init_.py
+│   ├── db/
+│   │   ├── session.py
+│   │   ├── supabase_ssl.py
+│   │   ├── __init__.py
+│   │   ├── crud/
+│   │   │   ├── bom.py
+│   │   │   ├── company_details.py
+│   │   │   ├── crm.py
+│   │   │   ├── customers.py
+│   │   │   ├── delivery_challans.py
+│   │   │   ├── grn.py
+│   │   │   ├── material_transactions.py
+│   │   │   ├── products.py
+│   │   │   ├── purchase_inv.py
+│   │   │   ├── purchase_orders.py
+│   │   │   ├── rejections.py
+│   │   │   ├── sales_invoices.py
+│   │   │   ├── sales_orders.py
+│   │   │   ├── sequences.py
+│   │   │   ├── stock.py
+│   │   │   ├── users.py
+│   │   │   ├── vendors.py
+│   │   │   ├── voucher_columns.py
+│   │   │   ├── voucher_instances.py
+│   │   │   ├── voucher_types.py
+│   │   │   ├── work_orders.py
+│   │   ├── migrations/
+│   │   │   ├── env.py
+│   │   │   ├── versions/
+│   │   │   │   ├── initial_migrations.py
+│   │   │   │   ├── phase2_migration.py
+│   │   │   │   ├── phase3_migration.py
+│   │   │   │   ├── phase4_migration.py
+│   │   │   │   ├── phase5rev_migration.py
+│   │   │   │   ├── phase5_migrations.py
+│   │   ├── models/
+│   │   │   ├── base.py
+│   │   │   ├── bom.py
+│   │   │   ├── bom_components.py
+│   │   │   ├── cn_items.py
+│   │   │   ├── company_details.py
+│   │   │   ├── credit_notes.py
+│   │   │   ├── crm.py
+│   │   │   ├── customers.py
+│   │   │   ├── delivery_challans.py
+│   │   │   ├── delivery_challan_items.py
+│   │   │   ├── doc_sequences.py
+│   │   │   ├── grn.py
+│   │   │   ├── grn_items.py
+│   │   │   ├── material_transactions.py
+│   │   │   ├── po_items.py
+│   │   │   ├── products.py
+│   │   │   ├── proforma_invoice.py
+│   │   │   ├── proforma_invoice_items.py
+│   │   │   ├── purchase_inv.py
+│   │   │   ├── purchase_inv_items.py
+│   │   │   ├── purchase_orders.py
+│   │   │   ├── quotes.py
+│   │   │   ├── quote_form.py
+│   │   │   ├── rejections.py
+│   │   │   ├── sales_invoices.py
+│   │   │   ├── sales_inv_items.py
+│   │   │   ├── sales_orders.py
+│   │   │   ├── sales_order_items.py
+│   │   │   ├── stock.py
+│   │   │   ├── users.py
+│   │   │   ├── vendors.py
+│   │   │   ├── voucher_columns.py
+│   │   │   ├── voucher_instances.py
+│   │   │   ├── voucher_types.py
+│   │   │   ├── work_orders.py
+│   │   ├── schemas/
+│   │   │   ├── bom.py
+│   │   │   ├── cn_items.py
+│   │   │   ├── company_details.py
+│   │   │   ├── crm.py
+│   │   │   ├── customers.py
+│   │   │   ├── delivery_challans.py
+│   │   │   ├── doc_sequences.py
+│   │   │   ├── grn.py
+│   │   │   ├── products.py
+│   │   │   ├── purchase_inv.py
+│   │   │   ├── purchase_orders.py
+│   │   │   ├── rejections.py
+│   │   │   ├── sales_invoices.py
+│   │   │   ├── sales_orders.py
+│   │   │   ├── stock.py
+│   │   │   ├── users.py
+│   │   │   ├── vendors.py
+│   │   │   ├── voucher_columns.py
+│   │   │   ├── voucher_instances.py
+│   │   │   ├── voucher_types.py
+│   │   │   ├── work_orders.py
+│   ├── logs/
+│   ├── services/
+│   │   ├── backup.py
+│   │   ├── document_utils.py
+│   │   ├── pdf.py
+│   │   ├── utils.py
+│   ├── static/
+│   │   ├── css/
+│   │   ├── js/
+│   ├── templates/
+│   │   ├── crm/

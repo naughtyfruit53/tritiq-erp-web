@@ -1,0 +1,36 @@
+<!-- src/templates/voucher_columns.html -->
+{% extends "base.html" %}
+{% block title %}Voucher Columns{% endblock %}
+{% block content %}
+<h2>Voucher Columns for Type ID {{ voucher_type_id }}</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Mandatory</th>
+            <th>Order</th>
+            <th>Calculated</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for vc in voucher_columns %}
+        <tr>
+            <td>{{ vc.id }}</td>
+            <td>{{ vc.column_name }}</td>
+            <td>{{ vc.data_type }}</td>
+            <td>{{ vc.is_mandatory }}</td>
+            <td>{{ vc.display_order }}</td>
+            <td>{{ vc.is_calculated }}</td>
+            <td>
+                <a href="/edit_voucher_column/{{ vc.id }}" class="btn btn-sm btn-primary">Edit</a>
+                <a href="/delete_voucher_column/{{ vc.id }}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="/add_voucher_column/{{ voucher_type_id }}" class="btn btn-success">Add Column</a>
+{% endblock %}

@@ -1,0 +1,35 @@
+
+ <!-- src/templates/products.html -->
+{% extends "base.html" %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<h2>Products</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Unit</th>
+            <th>Price</th>
+            <th>GST Rate</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+        <tr>
+            <td>{{ product.id }}</td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.unit }}</td>
+            <td>{{ product.unit_price }}</td>
+            <td>{{ product.gst_rate }}</td>
+            <td>
+                <a href="/edit_product/{{ product.id }}" class="btn btn-sm btn-primary">Edit</a>
+                <a href="/delete_product/{{ product.id }}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="/add_product" class="btn btn-success">Add Product</a>
+{% endblock %}

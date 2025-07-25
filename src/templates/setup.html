@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Setup First User</title>
+    <link rel="stylesheet" href="/static/css/styles.css">  <!-- Link to your CSS if it exists -->
+</head>
+<body>
+    <h1>Setup First User</h1>
+    <p>This is the first time the app is running. Create an admin user.</p>
+    <form action="/setup" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        
+        <button type="submit">Create User</button>
+    </form>
+</body>
+</html>

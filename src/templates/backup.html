@@ -1,0 +1,25 @@
+<!-- src/templates/backup.html -->
+{% extends "base.html" %}
+{% block title %}Backup & Restore{% endblock %}
+{% block content %}
+<h2>Backup & Restore</h2>
+<div class="card mb-3">
+  <div class="card-header">Create Backup</div>
+  <div class="card-body">
+    <p>Click to create a backup of the database.</p>
+    <form method="post" action="/api/v1/erp/backup/create">
+      <button type="submit" class="btn btn-primary">Create Backup</button>
+    </form>
+  </div>
+</div>
+<div class="card mb-3">
+  <div class="card-header">Restore Backup</div>
+  <div class="card-body">
+    <p>Upload a backup file to restore the database.</p>
+    <form method="post" action="/api/v1/erp/restore" enctype="multipart/form-data">
+      <input type="file" name="file" class="form-control mb-2">
+      <button type="submit" class="btn btn-danger">Restore</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

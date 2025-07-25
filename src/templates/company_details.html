@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Company Details</title>
+    <link rel="stylesheet" href="/static/css/company.css">
+    <script>
+        // States and codes as per GST
+        const states = {
+            "Andaman and Nicobar Islands": "35",
+            "Andhra Pradesh": "37",
+            "Arunachal Pradesh": "12",
+            "Assam": "18",
+            "Bihar": "10",
+            "Chandigarh": "04",
+            "Chhattisgarh": "22",
+            "Dadra and Nagar Haveli and Daman and Diu": "26",
+            "Delhi": "07",
+            "Goa": "30",
+            "Gujarat": "24",
+            "Haryana": "06",
+            "Himachal Pradesh": "02",
+            "Jammu and Kashmir": "01",
+            "Jharkhand": "20",
+            "Karnataka": "29",
+            "Kerala": "32",
+            "Ladakh": "38",
+            "Lakshadweep": "31",
+            "Madhya Pradesh": "23",
+            "Maharashtra": "27",
+            "Manipur": "14",
+            "Meghalaya": "17",
+            "Mizoram": "15",
+            "Nagaland": "13",
+            "Odisha": "21",
+            "Other Territory": "97",
+            "Puducherry": "34",
+            "Punjab": "03",
+            "Rajasthan": "08",
+            "Sikkim": "11",
+            "Tamil Nadu": "33",
+            "Telangana": "36",
+            "Tripura": "16",
+            "Uttar Pradesh": "09",
+            "Uttarakhand": "05",
+            "West Bengal": "19"
+        };
+
+        function updateStateCode() {
+            const stateSelect = document.getElementById("state");
+            const stateCodeInput = document.getElementById("state_code");
+            const selectedState = stateSelect.value;
+            stateCodeInput.value = states[selectedState] || "";
+        }
+
+        async function updateFromPin() {
+            const pinInput = document.getElementById("pin");
+            const cityInput = document.getElementById("city");
+            const stateSelect = document.getElementById("state");
+            const pin = pinInput.value.trim();
+            if (pin.length !== 6) return;
+
+            try {
+                const response = await fetch(`/api/lookup_pin?pin=${pin}`);
+                const data = await response.json();
+                if (data.status === "Success" && data.postOffice && data.postOffice.length > 0) {
+                    const office = data.postOffice[0];
+                    cityInput.value = office.District;  // Editable
+                    stateSelect.value = office.State;  // Editable
+                    updateStateCode();
+                }
+            } catch (error) {
+                console.error("PIN lookup failed", error);
+            }
+        }
+
+        async function updateFromGst() {
+            const gstInput = document.getElementById("gst_no");
+            const gst = gstInput.value.trim().toUpperCase();
+            if (gst.length !== 15) return;
+
+            try {
+                const response = await fetch(`/api/lookup_gst?gst=${gst}`);
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById("address1").value = data.address || '';
+                    document.getElementById("city").value = data.city || '';
+                    document.getElementById("state").value = data.state || '';
+                    document.getElementById("pin").value = data.pin || '';
+                    updateStateCode();
+                }
+            } catch (error) {
+                console.error("GST lookup failed", error);
+            }
+        }
+    </script>
+    <style>
+        /* Grid for alignment */
+        form {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px;
+            max-width: 600px;
+            text-align: left;  /* Left alignment for the form */
+        }
+        label {
+            text-align: right;
+            padding-right: 10px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            box-sizing: border-box;
+            min-width: 300px;  /* Prevent compression */
+        }
+        .buttons {
+            grid-column: span 2;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Company Details</h1>
+    <form action="/company" method="post" enctype="multipart/form-data">
+        <label for="company_name">Company Name*:</label>
+        <input type="text" id="company_name" name="company_name" value="{{ company.company_name if company else '' }}" required>
+
+        <label for="address1">Address Line 1*:</label>
+        <input type="text" id="address1" name="address1" value="{{ company.address1 if company else '' }}" required>
+
+        <label for="address2">Address Line 2:</label>
+        <input type="text" id="address2" name="address2" value="{{ company.address2 if company else '' }}">
+
+        <label for="pin">PIN Code*:</label>
+        <input type="text" id="pin" name="pin" value="{{ company.pin if company else '' }}" required onchange="updateFromPin()">
+
+        <label for="city">City*:</label>
+        <input type="text" id="city" name="city" value="{{ company.city if company else '' }}" required>
+
+        <label for="state">State*:</label>
+        <select id="state" name="state" onchange="updateStateCode()" required>
+            <option value="">Select State</option>
+            {% for state in states %}
+            <option value="{{ state }}" {% if company and company.state == state %}selected{% endif %}>{{ state }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="state_code">State Code*:</label>
+        <input type="text" id="state_code" name="state_code" value="{{ company.state_code if company else '' }}" readonly required>
+
+        <label for="gst_no">GST No:</label>
+        <input type="text" id="gst_no" name="gst_no" value="{{ company.gst_no if company else '' }}" onchange="updateFromGst()">
+
+        <label for="pan_no">PAN No:</label>
+        <input type="text" id="pan_no" name="pan_no" value="{{ company.pan_no if company else '' }}">
+
+        <label for="contact_no">Contact No*:</label>
+        <input type="text" id="contact_no" name="contact_no" value="{{ company.contact_no if company else '' }}" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="{{ company.email if company else '' }}">
+
+        <label for="logo">Logo:</label>
+        <input type="file" id="logo" name="logo" accept="image/*">
+        <p>Current Logo Path: {{ company.logo_path if company else 'None' }}</p>
+
+        <div class="buttons">
+            <button type="submit">Save</button>
+            <button type="button" onclick="window.location.href='/dashboard'">Cancel</button>
+        </div>
+    </form>
+
+    <script>
+        updateStateCode();  // Initialize on load
+    </script>
+</body>
+</html>

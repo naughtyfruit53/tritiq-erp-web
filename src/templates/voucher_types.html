@@ -1,0 +1,32 @@
+<!-- src/templates/voucher_types.html -->
+{% extends "base.html" %}
+{% block title %}Voucher Types{% endblock %}
+{% block content %}
+<h2>Voucher Types</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Default</th>
+            <th>Module</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for vt in voucher_types %}
+        <tr>
+            <td>{{ vt.id }}</td>
+            <td>{{ vt.name }}</td>
+            <td>{{ vt.is_default }}</td>
+            <td>{{ vt.module_name }}</td>
+            <td>
+                <a href="/edit_voucher_type/{{ vt.id }}" class="btn btn-sm btn-primary">Edit</a>
+                <a href="/delete_voucher_type/{{ vt.id }}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="/add_voucher_type" class="btn btn-success">Add Voucher Type</a>
+{% endblock %}

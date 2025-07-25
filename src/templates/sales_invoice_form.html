@@ -1,0 +1,159 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script>{% extends "base.html" %}
+{% block title %}{% if data %}Edit{% else %}Create{% endif %} Sales Invoice{% endblock %}
+{% block content %}
+<h2>{% if data %}Edit{% else %}Create{% endif %} Sales Invoice</h2>
+<form method="post" action="{% if data %}/sales_invoices/{{ data.id }}{% else %}/sales_invoices{% endif %}">
+    <input type="hidden" id="items_json" name="items_json">
+    <div class="mb-3">
+        <label for="sales_inv_number" class="form-label">Sales Invoice Number</label>
+        <input type="text" class="form-control" id="sales_inv_number" name="sales_inv_number" value="{{ data.sales_inv_number or '' }}" readonly>
+    </div>
+    <div class="mb-3">
+        <label for="invoice_date" class="form-label">Invoice Date</label>
+        <input type="date" class="form-control" id="invoice_date" name="invoice_date" value="{{ data.invoice_date or today }}">
+    </div>
+    <div class="mb-3">
+        <label for="sales_order_id" class="form-label">Sales Order</label>
+        <select class="form-control" id="sales_order_id" name="sales_order_id">
+            <option value="">No Sales Order</option>
+            {% for so in sales_orders %}
+            <option value="{{ so.id }}" {% if data and data.sales_order_id == so.id %}selected{% endif %}>{{ so.sales_order_number }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="customer_id" class="form-label">Customer</label>
+        <select class="form-control" id="customer_id" name="customer_id">
+            {% for c in customers %}
+            <option value="{{ c.id }}" {% if data and data.customer_id == c.id %}selected{% endif %}>{{ c.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="voucher_type_id" class="form-label">Voucher Type</label>
+        <select class="form-control" id="voucher_type_id" name="voucher_type_id">
+            {% for vt in voucher_types %}
+            <option value="{{ vt.id }}" {% if data and data.voucher_type_id == vt.id %}selected{% endif %}>{{ vt.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <table id="items_table" class="table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+                <th>Unit Price</th>
+                <th>GST Rate</th>
+                <th>Amount</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in data.items or [] %}
+            <tr>
+                <td><select class="form-control product-select">
+                    {% for p in products %}
+                    <option value="{{ p.id }}" {% if item.product_id == p.id %}selected{% endif %}>{{ p.name }}</option>
+                    {% endfor %}
+                </select></td>
+                <td><input type="number" class="form-control quantity" value="{{ item.quantity }}" onchange="calculateAmount(this)"></td>
+                <td><input type="text" class="form-control unit" value="{{ item.unit }}"></td>
+                <td><input type="number" class="form-control unit_price" value="{{ item.unit_price }}" onchange="calculateAmount(this)"></td>
+                <td><input type="number" class="form-control gst_rate" value="{{ item.gst_rate }}" onchange="calculateAmount(this)"></td>
+                <td><input type="number" class="form-control amount" value="{{ item.amount }}" readonly></td>
+                <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">Remove</button></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-primary" onclick="addRow()">Add Item</button>
+    <button type="submit" class="btn btn-success">Save</button>
+</form>
+<script>
+const products = {{ products | tojson | safe }};
+let productsOptions = products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+
+function addRow() {
+    const tbody = document.querySelector('#items_table tbody');
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td><select class="form-control product-select">${productsOptions}</select></td>
+        <td><input type="number" class="form-control quantity" value="1" onchange="calculateAmount(this)"></td>
+        <td><input type="text" class="form-control unit" value="pcs"></td>
+        <td><input type="number" class="form-control unit_price" value="0" onchange="calculateAmount(this)"></td>
+        <td><input type="number" class="form-control gst_rate" value="18" onchange="calculateAmount(this)"></td>
+        <td><input type="number" class="form-control amount" value="0" readonly></td>
+        <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">Remove</button></td>
+    `;
+    tbody.appendChild(row);
+}
+
+function removeRow(btn) {
+    btn.closest('tr').remove();
+}
+
+function calculateAmount(input) {
+    const row = input.closest('tr');
+    const qty = parseFloat(row.querySelector('.quantity').value) || 0;
+    const price = parseFloat(row.querySelector('.unit_price').value) || 0;
+    const gst = parseFloat(row.querySelector('.gst_rate').value) || 0;
+    row.querySelector('.amount').value = qty * price * (1 + gst / 100);
+}
+
+document.querySelector('form').addEventListener('submit', function() {
+    const rows = document.querySelectorAll('#items_table tbody tr');
+    const items = [];
+    rows.forEach(row => {
+        items.push({
+            product_id: row.querySelector('.product-select').value,
+            quantity: parseFloat(row.querySelector('.quantity').value) || 0,
+            unit: row.querySelector('.unit').value,
+            unit_price: parseFloat(row.querySelector('.unit_price').value) || 0,
+            gst_rate: parseFloat(row.querySelector('.gst_rate').value) || 0,
+            amount: parseFloat(row.querySelector('.amount').value) || 0
+        });
+    });
+    document.getElementById('items_json').value = JSON.stringify(items);
+});
+</script>
+{% endblock %}

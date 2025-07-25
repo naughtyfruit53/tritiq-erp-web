@@ -1,0 +1,29 @@
+<!-- src/templates/crm/follow_ups.html -->
+{% extends "base.html" %}
+{% block title %}Follow-Ups{% endblock %}
+{% block content %}
+<h2>Follow-Ups</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Lead</th>
+      <th>Description</th>
+      <th>Date</th>
+      <th>Created At</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for follow_up in follow_ups %}
+    <tr>
+      <td>{{ follow_up.id }}</td>
+      <td>{{ follow_up.lead_id }}</td>
+      <td>{{ follow_up.description }}</td>
+      <td>{{ follow_up.date }}</td>
+      <td>{{ follow_up.created_at }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a href="/follow_ups/create" class="btn btn-primary">Create Follow-Up</a>
+{% endblock %}

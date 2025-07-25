@@ -1,0 +1,128 @@
+<!-- src/templates/credit_note_form.html -->
+{% extends "base.html" %}
+{% block title %}{% if data %}Edit{% else %}Create{% endif %} Credit Note{% endblock %}
+{% block content %}
+<h2>{% if data %}Edit{% else %}Create{% endif %} Credit Note</h2>
+<form method="post" action="{% if data %}/api/v1/erp/credit_notes/{{ data.id }}{% else %}/api/v1/erp/credit_notes{% endif %}">
+  <input type="hidden" id="items_json" name="items_json">
+  <div class="mb-3">
+    <label for="cn_number" class="form-label">Credit Note Number</label>
+    <input type="text" class="form-control" id="cn_number" name="cn_number" value="{{ data.cn_number or '' }}" readonly>
+  </div>
+  <div class="mb-3">
+    <label for="grn_id" class="form-label">GRN</label>
+    <select class="form-control" id="grn_id" name="grn_id">
+      {% for g in grns %}
+      <option value="{{ g.id }}" {% if data and data.grn_id == g.id %}selected{% endif %}>{{ g.grn_number }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="mb-3">
+    <label for="po_id" class="form-label">PO</label>
+    <select class="form-control" id="po_id" name="po_id">
+      {% for po in purchase_orders %}
+      <option value="{{ po.id }}" {% if data and data.po_id == po.id %}selected{% endif %}>{{ po.po_number }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="mb-3">
+    <label for="vendor_id" class="form-label">Vendor</label>
+    <select class="form-control" id="vendor_id" name="vendor_id">
+      {% for v in vendors %}
+      <option value="{{ v.id }}" {% if data and data.vendor_id == v.id %}selected{% endif %}>{{ v.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="mb-3">
+    <label for="cn_date" class="form-label">Credit Note Date</label>
+    <input type="date" class="form-control" id="cn_date" name="cn_date" value="{{ data.cn_date or today }}">
+  </div>
+  <div class="mb-3">
+    <label for="voucher_type_id" class="form-label">Voucher Type</label>
+    <select class="form-control" id="voucher_type_id" name="voucher_type_id">
+      {% for vt in voucher_types %}
+      <option value="{{ vt.id }}" {% if data and data.voucher_type_id == vt.id %}selected{% endif %}>{{ vt.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <table id="items_table" class="table">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Unit</th>
+        <th>Unit Price</th>
+        <th>GST Rate</th>
+        <th>Amount</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in data.items or [] %}
+      <tr>
+        <td><select class="form-control product-select">
+          {% for p in products %}
+          <option value="{{ p.id }}" {% if item.product_id == p.id %}selected{% endif %}>{{ p.name }}</option>
+          {% endfor %}
+        </select></td>
+        <td><input type="number" class="form-control quantity" value="{{ item.quantity }}" onchange="calculateAmount(this)"></td>
+        <td><input type="text" class="form-control unit" value="{{ item.unit }}"></td>
+        <td><input type="number" class="form-control unit_price" value="{{ item.unit_price }}" onchange="calculateAmount(this)"></td>
+        <td><input type="number" class="form-control gst_rate" value="{{ item.gst_rate }}" onchange="calculateAmount(this)"></td>
+        <td><input type="number" class="form-control amount" value="{{ item.amount }}" readonly></td>
+        <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">Remove</button></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <button type="button" class="btn btn-primary" onclick="addRow()">Add Item</button>
+  <button type="submit" class="btn btn-success">Save</button>
+</form>
+<script>
+const products = {{ products | tojson | safe }};
+let productsOptions = products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+
+function addRow() {
+  const tbody = document.querySelector('#items_table tbody');
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td><select class="form-control product-select">${productsOptions}</select></td>
+    <td><input type="number" class="form-control quantity" value="1" onchange="calculateAmount(this)"></td>
+    <td><input type="text" class="form-control unit" value="pcs"></td>
+    <td><input type="number" class="form-control unit_price" value="0" onchange="calculateAmount(this)"></td>
+    <td><input type="number" class="form-control gst_rate" value="18" onchange="calculateAmount(this)"></td>
+    <td><input type="number" class="form-control amount" value="0" readonly></td>
+    <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">Remove</button></td>
+  `;
+  tbody.appendChild(row);
+}
+
+function removeRow(btn) {
+  btn.closest('tr').remove();
+}
+
+function calculateAmount(input) {
+  const row = input.closest('tr');
+  const qty = parseFloat(row.querySelector('.quantity').value) || 0;
+  const price = parseFloat(row.querySelector('.unit_price').value) || 0;
+  const gst = parseFloat(row.querySelector('.gst_rate').value) || 0;
+  row.querySelector('.amount').value = qty * price * (1 + gst / 100);
+}
+
+document.querySelector('form').addEventListener('submit', function() {
+  const rows = document.querySelectorAll('#items_table tbody tr');
+  const items = [];
+  rows.forEach(row => {
+    items.push({
+      product_id: row.querySelector('.product-select').value,
+      quantity: parseFloat(row.querySelector('.quantity').value) || 0,
+      unit: row.querySelector('.unit').value,
+      unit_price: parseFloat(row.querySelector('.unit_price').value) || 0,
+      gst_rate: parseFloat(row.querySelector('.gst_rate').value) || 0,
+      amount: parseFloat(row.querySelector('.amount').value) || 0
+    });
+  });
+  document.getElementById('items_json').value = JSON.stringify(items);
+});
+</script>
+{% endblock %}
