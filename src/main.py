@@ -24,6 +24,7 @@ from src.web_routes.backup_routes import backup_router
 from src.web_routes.custom_voucher_routes import custom_voucher_router
 from src.db.session import get_db_context
 from src.db.crud.voucher_types import get_voucher_types, create_voucher_type
+from src.db.crud.voucher_instances import get_voucher_instances_by_type
 from src.db.schemas.voucher_types import VoucherTypeCreate
 import logging
 
@@ -58,16 +59,16 @@ async def seed_voucher_types(db):
     existing = await get_voucher_types(db)
     if not existing:
         predefined = [
-            VoucherTypeCreate(name="Sales Order", module_name="sales_order", is_default=True),
-            VoucherTypeCreate(name="Sales Invoice", module_name="sales_inv", is_default=False),
-            VoucherTypeCreate(name="Purchase Order", module_name="purchase_order", is_default=False),
-            VoucherTypeCreate(name="Purchase Invoice", module_name="purchase_inv", is_default=False),
-            VoucherTypeCreate(name="Quotation", module_name="quotation", is_default=False),
-            VoucherTypeCreate(name="Proforma Invoice", module_name="proforma_invoice", is_default=False),
-            VoucherTypeCreate(name="Credit Note", module_name="credit_note", is_default=False),
-            VoucherTypeCreate(name="GRN", module_name="grn", is_default=False),
-            VoucherTypeCreate(name="Rejection", module_name="rejection", is_default=False),
-            VoucherTypeCreate(name="Delivery Challan", module_name="delivery_challan", is_default=False),
+            VoucherTypeCreate(name="Sales Order", module_name="sales_order", category="sales", is_default=True),
+            VoucherTypeCreate(name="Sales Invoice", module_name="sales_inv", category="sales", is_default=False),
+            VoucherTypeCreate(name="Purchase Order", module_name="purchase_order", category="purchase", is_default=False),
+            VoucherTypeCreate(name="Purchase Invoice", module_name="purchase_inv", category="purchase", is_default=False),
+            VoucherTypeCreate(name="Quotation", module_name="quotation", category="sales", is_default=False),
+            VoucherTypeCreate(name="Proforma Invoice", module_name="proforma_invoice", category="sales", is_default=False),
+            VoucherTypeCreate(name="Credit Note", module_name="credit_note", category="sales", is_default=False),
+            VoucherTypeCreate(name="GRN", module_name="grn", category="purchase", is_default=False),
+            VoucherTypeCreate(name="Rejection", module_name="rejection", category="purchase", is_default=False),
+            VoucherTypeCreate(name="Delivery Challan", module_name="delivery_challan", category="sales", is_default=False),
         ]
         for vt in predefined:
             await create_voucher_type(db, vt)
@@ -99,9 +100,28 @@ async def add_voucher_categories(request: Request, call_next):
             sales = []
             financial = []
             internal = []
+            
             for vt in voucher_types:
                 vt_link = mappings.get(vt.module_name, "/voucher_types")
-                vt_dict = {"name": vt.name if hasattr(vt, 'name') else vt.module_name.replace('_', ' ').capitalize(), "link": vt_link, "id": vt.id}
+                vt_dict = {
+                    "name": vt.name if hasattr(vt, 'name') else vt.module_name.replace('_', ' ').capitalize(),
+                    "link": vt_link,
+                    "id": vt.id,
+                    "module_name": vt.module_name,
+                    "instances": []
+                }
+                
+                # Load voucher instances for this type
+                instances = await get_voucher_instances_by_type(db, vt.id, limit=10)  # Limit to avoid overwhelming menu
+                for instance in instances:
+                    instance_dict = {
+                        "id": instance.id,
+                        "voucher_number": instance.voucher_number,
+                        "link": f"/voucher_instances/{instance.id}",
+                        "created_at": instance.created_at
+                    }
+                    vt_dict["instances"].append(instance_dict)
+                
                 if vt.category == 'purchase':
                     purchase.append(vt_dict)
                 elif vt.category == 'sales':
@@ -110,6 +130,7 @@ async def add_voucher_categories(request: Request, call_next):
                     financial.append(vt_dict)
                 elif vt.category == 'internal':
                     internal.append(vt_dict)
+            
             grouped = {"purchase": purchase, "sales": sales, "financial": financial, "internal": internal}
             request.state.grouped_vouchers = grouped
     except Exception as e:
