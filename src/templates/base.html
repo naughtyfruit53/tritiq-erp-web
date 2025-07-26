@@ -43,7 +43,22 @@
                                         <h5>Purchase Vouchers</h5>
                                         <ul class="list-unstyled">
                                             {% for voucher in request.state.grouped_vouchers.purchase %}
-                                            <li><a class="dropdown-item" href="{{ voucher.link }}">{{ voucher.name }}</a></li>
+                                            <li class="mb-2">
+                                                <a class="dropdown-item fw-bold" href="{{ voucher.link }}">{{ voucher.name }}</a>
+                                                {% if voucher.instances %}
+                                                <ul class="list-unstyled ms-3 small">
+                                                    {% for instance in voucher.instances %}
+                                                    <li><a class="dropdown-item text-muted py-1" href="{{ instance.link }}">{{ instance.voucher_number }}</a></li>
+                                                    {% endfor %}
+                                                    {% if voucher.instances|length == 10 %}
+                                                    <li><a class="dropdown-item text-info py-1" href="/voucher_instances?type={{ voucher.id }}">View more...</a></li>
+                                                    {% endif %}
+                                                </ul>
+                                                {% endif %}
+                                                <div class="ms-3 mb-1">
+                                                    <a href="/vouchers/create_custom?module={{ voucher.module_name }}" class="btn btn-outline-primary btn-sm">+ Create New</a>
+                                                </div>
+                                            </li>
                                             {% endfor %}
                                             <li><hr class="dropdown-divider"></li>
                                             <li><a class="dropdown-item" href="/vouchers/create_custom?module=purchase">Create Custom Voucher</a></li>
@@ -53,7 +68,22 @@
                                         <h5>Sales Vouchers</h5>
                                         <ul class="list-unstyled">
                                             {% for voucher in request.state.grouped_vouchers.sales %}
-                                            <li><a class="dropdown-item" href="{{ voucher.link }}">{{ voucher.name }}</a></li>
+                                            <li class="mb-2">
+                                                <a class="dropdown-item fw-bold" href="{{ voucher.link }}">{{ voucher.name }}</a>
+                                                {% if voucher.instances %}
+                                                <ul class="list-unstyled ms-3 small">
+                                                    {% for instance in voucher.instances %}
+                                                    <li><a class="dropdown-item text-muted py-1" href="{{ instance.link }}">{{ instance.voucher_number }}</a></li>
+                                                    {% endfor %}
+                                                    {% if voucher.instances|length == 10 %}
+                                                    <li><a class="dropdown-item text-info py-1" href="/voucher_instances?type={{ voucher.id }}">View more...</a></li>
+                                                    {% endif %}
+                                                </ul>
+                                                {% endif %}
+                                                <div class="ms-3 mb-1">
+                                                    <a href="/vouchers/create_custom?module={{ voucher.module_name }}" class="btn btn-outline-primary btn-sm">+ Create New</a>
+                                                </div>
+                                            </li>
                                             {% endfor %}
                                             <li><hr class="dropdown-divider"></li>
                                             <li><a class="dropdown-item" href="/vouchers/create_custom?module=sales">Create Custom Voucher</a></li>
@@ -63,7 +93,22 @@
                                         <h5>Financial Vouchers</h5>
                                         <ul class="list-unstyled">
                                             {% for voucher in request.state.grouped_vouchers.financial %}
-                                            <li><a class="dropdown-item" href="{{ voucher.link }}">{{ voucher.name }}</a></li>
+                                            <li class="mb-2">
+                                                <a class="dropdown-item fw-bold" href="{{ voucher.link }}">{{ voucher.name }}</a>
+                                                {% if voucher.instances %}
+                                                <ul class="list-unstyled ms-3 small">
+                                                    {% for instance in voucher.instances %}
+                                                    <li><a class="dropdown-item text-muted py-1" href="{{ instance.link }}">{{ instance.voucher_number }}</a></li>
+                                                    {% endfor %}
+                                                    {% if voucher.instances|length == 10 %}
+                                                    <li><a class="dropdown-item text-info py-1" href="/voucher_instances?type={{ voucher.id }}">View more...</a></li>
+                                                    {% endif %}
+                                                </ul>
+                                                {% endif %}
+                                                <div class="ms-3 mb-1">
+                                                    <a href="/vouchers/create_custom?module={{ voucher.module_name }}" class="btn btn-outline-primary btn-sm">+ Create New</a>
+                                                </div>
+                                            </li>
                                             {% endfor %}
                                             <li><hr class="dropdown-divider"></li>
                                             <li><a class="dropdown-item" href="/vouchers/create_custom?module=financial">Create Custom Voucher</a></li>
@@ -73,7 +118,22 @@
                                         <h5>Internal Vouchers</h5>
                                         <ul class="list-unstyled">
                                             {% for voucher in request.state.grouped_vouchers.internal %}
-                                            <li><a class="dropdown-item" href="{{ voucher.link }}">{{ voucher.name }}</a></li>
+                                            <li class="mb-2">
+                                                <a class="dropdown-item fw-bold" href="{{ voucher.link }}">{{ voucher.name }}</a>
+                                                {% if voucher.instances %}
+                                                <ul class="list-unstyled ms-3 small">
+                                                    {% for instance in voucher.instances %}
+                                                    <li><a class="dropdown-item text-muted py-1" href="{{ instance.link }}">{{ instance.voucher_number }}</a></li>
+                                                    {% endfor %}
+                                                    {% if voucher.instances|length == 10 %}
+                                                    <li><a class="dropdown-item text-info py-1" href="/voucher_instances?type={{ voucher.id }}">View more...</a></li>
+                                                    {% endif %}
+                                                </ul>
+                                                {% endif %}
+                                                <div class="ms-3 mb-1">
+                                                    <a href="/vouchers/create_custom?module={{ voucher.module_name }}" class="btn btn-outline-primary btn-sm">+ Create New</a>
+                                                </div>
+                                            </li>
                                             {% endfor %}
                                             <li><hr class="dropdown-divider"></li>
                                             <li><a class="dropdown-item" href="/vouchers/create_custom?module=internal">Create Custom Voucher</a></li>

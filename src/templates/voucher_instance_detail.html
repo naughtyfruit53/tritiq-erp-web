@@ -1,0 +1,50 @@
+<!-- src/templates/voucher_instance_detail.html -->
+{% extends "base.html" %}
+{% block title %}Voucher Instance - {{ voucher_instance.voucher_number }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h2>Voucher Instance Details</h2>
+        <div class="card">
+            <div class="card-header">
+                <h5>{{ voucher_instance.voucher_number }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Voucher Number:</strong> {{ voucher_instance.voucher_number }}</p>
+                        <p><strong>Module:</strong> {{ voucher_instance.module_name }}</p>
+                        <p><strong>Record ID:</strong> {{ voucher_instance.record_id }}</p>
+                        <p><strong>Created At:</strong> {{ voucher_instance.created_at.strftime('%Y-%m-%d %H:%M:%S') if voucher_instance.created_at else 'N/A' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if voucher_instance.voucher_type %}
+                        <p><strong>Voucher Type:</strong> {{ voucher_instance.voucher_type.name }}</p>
+                        <p><strong>Category:</strong> {{ voucher_instance.voucher_type.category.title() }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if voucher_instance.data_json %}
+                <div class="mt-3">
+                    <h6>Voucher Data:</h6>
+                    <pre class="bg-light p-3 rounded">{{ voucher_instance.data_json }}</pre>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6>Actions</h6>
+            </div>
+            <div class="card-body">
+                <a href="/voucher_instances" class="btn btn-secondary btn-sm mb-2">← Back to All Vouchers</a>
+                {% if voucher_instance.voucher_type %}
+                <a href="/vouchers/create_custom?module={{ voucher_instance.voucher_type.module_name }}" class="btn btn-primary btn-sm mb-2">Create Similar</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

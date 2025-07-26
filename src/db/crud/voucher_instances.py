@@ -1,5 +1,6 @@
 from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from ..models.voucher_instances import VoucherInstance
 from ..schemas.voucher_instances import (
     VoucherInstanceCreate, 
@@ -38,8 +39,10 @@ async def get_voucher_instances(
     """
     result = await db.execute(
         select(VoucherInstance)
+        .options(selectinload(VoucherInstance.voucher_type))
         .offset(skip)
         .limit(limit)
+        .order_by(VoucherInstance.created_at.desc())
     )
     return result.scalars().all()
 
@@ -52,6 +55,7 @@ async def get_voucher_instance(
     """
     result = await db.execute(
         select(VoucherInstance)
+        .options(selectinload(VoucherInstance.voucher_type))
         .where(VoucherInstance.id == voucher_instance_id)
     )
     return result.scalar_one_or_none()
@@ -67,9 +71,11 @@ async def get_voucher_instances_by_type(
     """
     result = await db.execute(
         select(VoucherInstance)
+        .options(selectinload(VoucherInstance.voucher_type))
         .where(VoucherInstance.voucher_type_id == voucher_type_id)
         .offset(skip)
         .limit(limit)
+        .order_by(VoucherInstance.created_at.desc())
     )
     return result.scalars().all()
 

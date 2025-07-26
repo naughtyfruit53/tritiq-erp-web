@@ -10,9 +10,10 @@ class VoucherType(Base):
     name = Column(String, unique=True, nullable=False)
     is_default = Column(Boolean, default=False, nullable=False)
     module_name = Column(String, nullable=False)
+    category = Column(String, nullable=False)  # Added missing category field
     
     # Add the missing back_populates relationship to VoucherInstance
     instances = relationship("VoucherInstance", back_populates="voucher_type")
     
     def __repr__(self):
-        return f"<VoucherType(id={self.id}, name='{self.name}', is_default={self.is_default})>"
+        return f"<VoucherType(id={self.id}, name='{self.name}', category='{self.category}', is_default={self.is_default})>"

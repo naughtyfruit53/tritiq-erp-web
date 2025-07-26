@@ -79,6 +79,8 @@ a:hover {
     padding: 20px 0;
     border-radius: 0;
     box-shadow: 0 6px 12px rgba(0,0,0,.175);
+    max-height: 600px;
+    overflow-y: auto;
 }
 
 .mega-menu .container {
@@ -88,6 +90,9 @@ a:hover {
 .mega-menu h5 {
     font-size: 16px;
     margin-bottom: 10px;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 5px;
 }
 
 .mega-menu ul {
@@ -100,4 +105,42 @@ a:hover {
 
 .mega-menu .dropdown-divider {
     margin: 5px 0;
+}
+
+/* Enhanced voucher menu styles */
+.mega-menu .fw-bold {
+    font-weight: 600 !important;
+    color: #0d6efd;
+}
+
+.mega-menu .text-muted {
+    font-size: 0.85em;
+    padding-left: 15px !important;
+}
+
+.mega-menu .btn-sm {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    margin: 2px 0;
+}
+
+.mega-menu .text-info {
+    font-style: italic;
+}
+
+/* Make voucher instances list more compact */
+.mega-menu .small ul {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+/* Hover effects for better UX */
+.mega-menu .dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.mega-menu .fw-bold:hover {
+    color: #0a58ca;
+    background-color: #e7f1ff;
 }
