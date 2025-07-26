@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ERP System{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="/static/css/styles.css" rel="stylesheet">
 </head>
 <body>
@@ -35,48 +36,125 @@
                     <li class="nav-item dropdown mega-dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="vouchersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Vouchers &#128220;
+                            {% if request.state.grouped_vouchers.totals %}
+                            <span class="badge bg-secondary ms-1">
+                                {{ request.state.grouped_vouchers.totals.purchase + request.state.grouped_vouchers.totals.sales + request.state.grouped_vouchers.totals.financial + request.state.grouped_vouchers.totals.internal }}
+                            </span>
+                            {% endif %}
                         </a>
                         <ul class="dropdown-menu mega-menu" aria-labelledby="vouchersDropdown">
                             <div class="container">
                                 <div class="row">
                                     <div class="col-md-3">
-                                        <h5>Purchase Vouchers</h5>
+                                        <h5 class="text-primary">
+                                            <i class="bi bi-cart-fill"></i> Purchase Vouchers
+                                            {% if request.state.grouped_vouchers.totals.purchase > 0 %}
+                                            <span class="badge bg-primary ms-1">{{ request.state.grouped_vouchers.totals.purchase }}</span>
+                                            {% endif %}
+                                        </h5>
                                         <ul class="list-unstyled">
                                             {% for voucher in request.state.grouped_vouchers.purchase %}
-                                            <li><a class="dropdown-item" href="{{ voucher.link }}">{{ voucher.name }}</a></li>
+                                            <li class="mb-1">
+                                                <a class="dropdown-item d-flex justify-content-between align-items-center" href="{{ voucher.link }}">
+                                                    <span>{{ voucher.name }}</span>
+                                                    {% if voucher.count > 0 %}
+                                                    <span class="badge bg-light text-dark">{{ voucher.count }}</span>
+                                                    {% endif %}
+                                                </a>
+                                                <div class="small text-muted ms-3">
+                                                    <a href="{{ voucher.create_link }}" class="text-decoration-none">+ Create New</a>
+                                                </div>
+                                            </li>
                                             {% endfor %}
+                                            {% if not request.state.grouped_vouchers.purchase %}
+                                            <li class="text-muted small">No purchase voucher types available</li>
+                                            {% endif %}
                                             <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" href="/vouchers/create_custom?module=purchase">Create Custom Voucher</a></li>
+                                            <li><a class="dropdown-item" href="/vouchers/create_custom?module=purchase"><i class="bi bi-plus-circle"></i> Create Custom Purchase Voucher</a></li>
                                         </ul>
                                     </div>
                                     <div class="col-md-3">
-                                        <h5>Sales Vouchers</h5>
+                                        <h5 class="text-success">
+                                            <i class="bi bi-shop"></i> Sales Vouchers
+                                            {% if request.state.grouped_vouchers.totals.sales > 0 %}
+                                            <span class="badge bg-success ms-1">{{ request.state.grouped_vouchers.totals.sales }}</span>
+                                            {% endif %}
+                                        </h5>
                                         <ul class="list-unstyled">
                                             {% for voucher in request.state.grouped_vouchers.sales %}
-                                            <li><a class="dropdown-item" href="{{ voucher.link }}">{{ voucher.name }}</a></li>
+                                            <li class="mb-1">
+                                                <a class="dropdown-item d-flex justify-content-between align-items-center" href="{{ voucher.link }}">
+                                                    <span>{{ voucher.name }}</span>
+                                                    {% if voucher.count > 0 %}
+                                                    <span class="badge bg-light text-dark">{{ voucher.count }}</span>
+                                                    {% endif %}
+                                                </a>
+                                                <div class="small text-muted ms-3">
+                                                    <a href="{{ voucher.create_link }}" class="text-decoration-none">+ Create New</a>
+                                                </div>
+                                            </li>
                                             {% endfor %}
+                                            {% if not request.state.grouped_vouchers.sales %}
+                                            <li class="text-muted small">No sales voucher types available</li>
+                                            {% endif %}
                                             <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" href="/vouchers/create_custom?module=sales">Create Custom Voucher</a></li>
+                                            <li><a class="dropdown-item" href="/vouchers/create_custom?module=sales"><i class="bi bi-plus-circle"></i> Create Custom Sales Voucher</a></li>
                                         </ul>
                                     </div>
                                     <div class="col-md-3">
-                                        <h5>Financial Vouchers</h5>
+                                        <h5 class="text-warning">
+                                            <i class="bi bi-currency-dollar"></i> Financial Vouchers
+                                            {% if request.state.grouped_vouchers.totals.financial > 0 %}
+                                            <span class="badge bg-warning ms-1">{{ request.state.grouped_vouchers.totals.financial }}</span>
+                                            {% endif %}
+                                        </h5>
                                         <ul class="list-unstyled">
                                             {% for voucher in request.state.grouped_vouchers.financial %}
-                                            <li><a class="dropdown-item" href="{{ voucher.link }}">{{ voucher.name }}</a></li>
+                                            <li class="mb-1">
+                                                <a class="dropdown-item d-flex justify-content-between align-items-center" href="{{ voucher.link }}">
+                                                    <span>{{ voucher.name }}</span>
+                                                    {% if voucher.count > 0 %}
+                                                    <span class="badge bg-light text-dark">{{ voucher.count }}</span>
+                                                    {% endif %}
+                                                </a>
+                                                <div class="small text-muted ms-3">
+                                                    <a href="{{ voucher.create_link }}" class="text-decoration-none">+ Create New</a>
+                                                </div>
+                                            </li>
                                             {% endfor %}
+                                            {% if not request.state.grouped_vouchers.financial %}
+                                            <li class="text-muted small">No financial voucher types available</li>
+                                            {% endif %}
                                             <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" href="/vouchers/create_custom?module=financial">Create Custom Voucher</a></li>
+                                            <li><a class="dropdown-item" href="/vouchers/create_custom?module=financial"><i class="bi bi-plus-circle"></i> Create Custom Financial Voucher</a></li>
                                         </ul>
                                     </div>
                                     <div class="col-md-3">
-                                        <h5>Internal Vouchers</h5>
+                                        <h5 class="text-info">
+                                            <i class="bi bi-gear-fill"></i> Internal Vouchers
+                                            {% if request.state.grouped_vouchers.totals.internal > 0 %}
+                                            <span class="badge bg-info ms-1">{{ request.state.grouped_vouchers.totals.internal }}</span>
+                                            {% endif %}
+                                        </h5>
                                         <ul class="list-unstyled">
                                             {% for voucher in request.state.grouped_vouchers.internal %}
-                                            <li><a class="dropdown-item" href="{{ voucher.link }}">{{ voucher.name }}</a></li>
+                                            <li class="mb-1">
+                                                <a class="dropdown-item d-flex justify-content-between align-items-center" href="{{ voucher.link }}">
+                                                    <span>{{ voucher.name }}</span>
+                                                    {% if voucher.count > 0 %}
+                                                    <span class="badge bg-light text-dark">{{ voucher.count }}</span>
+                                                    {% endif %}
+                                                </a>
+                                                <div class="small text-muted ms-3">
+                                                    <a href="{{ voucher.create_link }}" class="text-decoration-none">+ Create New</a>
+                                                </div>
+                                            </li>
                                             {% endfor %}
+                                            {% if not request.state.grouped_vouchers.internal %}
+                                            <li class="text-muted small">No internal voucher types available</li>
+                                            {% endif %}
                                             <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" href="/vouchers/create_custom?module=internal">Create Custom Voucher</a></li>
+                                            <li><a class="dropdown-item" href="/vouchers/create_custom?module=internal"><i class="bi bi-plus-circle"></i> Create Custom Internal Voucher</a></li>
                                         </ul>
                                     </div>
                                 </div>

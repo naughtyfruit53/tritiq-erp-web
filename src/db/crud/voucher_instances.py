@@ -1,4 +1,4 @@
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..models.voucher_instances import VoucherInstance
 from ..schemas.voucher_instances import (
@@ -7,7 +7,7 @@ from ..schemas.voucher_instances import (
     VoucherInstance
 )
 import json
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 async def create_voucher_instance(
     db: AsyncSession, 
@@ -115,3 +115,44 @@ async def delete_voucher_instance(
     await db.execute(stmt)
     await db.commit()
     return True
+
+async def count_voucher_instances_by_type(
+    db: AsyncSession,
+    voucher_type_id: int
+) -> int:
+    """
+    Count voucher instances for a specific voucher type
+    """
+    result = await db.execute(
+        select(func.count(VoucherInstance.id))
+        .where(VoucherInstance.voucher_type_id == voucher_type_id)
+    )
+    return result.scalar() or 0
+
+async def get_voucher_instance_counts_by_types(
+    db: AsyncSession,
+    voucher_type_ids: List[int]
+) -> Dict[int, int]:
+    """
+    Get instance counts for multiple voucher types efficiently
+    Returns a dictionary mapping voucher_type_id to count
+    """
+    result = await db.execute(
+        select(
+            VoucherInstance.voucher_type_id,
+            func.count(VoucherInstance.id).label('count')
+        )
+        .where(VoucherInstance.voucher_type_id.in_(voucher_type_ids))
+        .group_by(VoucherInstance.voucher_type_id)
+    )
+    
+    counts = {}
+    for row in result:
+        counts[row.voucher_type_id] = row.count
+    
+    # Ensure all requested type IDs have an entry (default to 0)
+    for type_id in voucher_type_ids:
+        if type_id not in counts:
+            counts[type_id] = 0
+    
+    return counts
