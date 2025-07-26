@@ -1,7 +1,6 @@
-# src/db/migrations/env.py
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))  # Add project root to path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 
 from sqlalchemy import create_engine
 from sqlalchemy import pool
@@ -10,21 +9,23 @@ from src.db.models.base import Base
 from dotenv import load_dotenv
 import os
 
-load_dotenv()  # Load .env from project root
-
+load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL.startswith("postgresql+asyncpg://"):
-    DATABASE_URL = DATABASE_URL.replace("postgresql+asyncpg://", "postgresql://")  # Use sync driver for Alembic
-DATABASE_URL = DATABASE_URL.replace('%', '%%')  # Escape '%' for configparser
+    DATABASE_URL = DATABASE_URL.replace("postgresql+asyncpg://", "postgresql://")
+DATABASE_URL = DATABASE_URL.replace('%', '%%')
 
 config = context.config
-config.set_main_option('sqlalchemy.url', DATABASE_URL)  # Dynamically set URL
+config.set_main_option('sqlalchemy.url', DATABASE_URL)
 
 target_metadata = Base.metadata
 
 def run_migrations_offline():
     context.configure(
-        url=DATABASE_URL, target_metadata=target_metadata, literal_binds=True, dialect_opts={"paramstyle": "named"}
+        url=DATABASE_URL,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"}
     )
     with context.begin_transaction():
         context.run_migrations()

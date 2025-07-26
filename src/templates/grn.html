@@ -1,30 +1,80 @@
-<h2>GRNs</h2>
-<table class="table">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>GRN Number</th>
-      <th>PO Number</th>
-      <th>Date</th>
-      <th>Status</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for grn in grns %}
-    <tr>
-      <td>{{ grn.id }}</td>
-      <td>{{ grn.grn_number }}</td>
-      <td>{{ grn.po_id }}</td>
-      <td>{{ grn.created_at }}</td>
-      <td>{{ grn.status }}</td>
-      <td>
-        <a href="/grn/{{ grn.id }}/edit">Edit</a>
-        <a href="/grn/{{ grn.id }}/delete">Delete</a>
-        <a href="/grn/{{ grn.id }}/pdf">PDF</a>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-<a href="/grn/create">Create GRN</a>
+<!-- src/templates/grn.html -->
+{% extends "base.html" %}
+{% block title %}GRN{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">
+      <h3>GRN List</h3>
+      <table class="table table-striped" id="grn_table">
+        <thead>
+          <tr>
+            <th>GRN Number</th>
+            <th>PO Number</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for grn in grns %}
+          <tr data-id="{{ grn.id }}" onclick="loadForm('/grn/{{ grn.id }}/edit')">
+            <td>{{ grn.grn_number }}</td>
+            <td>{{ grn.po_id }}</td>  <!-- Assume po relation -->
+            <td>{{ grn.status }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <button class="btn btn-primary" onclick="clearForm()">New GRN</button>
+    </div>
+    <div class="col-md-8">
+      <h3>GRN Form</h3>
+      <form id="grn_form" method="post" action="/grn">
+        <input type="hidden" name="id" id="grn_id">
+        <div class="mb-3">
+          <label for="grn_number" class="form-label">GRN Number</label>
+          <input type="text" class="form-control" id="grn_number" name="grn_number" required>
+        </div>
+        <div class="mb-3">
+          <label for="po_id" class="form-label">PO Number</label>
+          <select class="form-control" id="po_id" name="po_id" required onchange="populateFromPO(this.value)">
+            {% for po in purchase_orders %}
+            <option value="{{ po.id }}">{{ po.po_number }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="created_at" class="form-label">Created At</label>
+          <input type="date" class="form-control" id="created_at" name="created_at" value="{{ today }}" required>
+        </div>
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <input type="text" class="form-control" id="description" name="description">
+        </div>
+        <div class="mb-3">
+          <label for="status" class="form-label">Status</label>
+          <input type="text" class="form-control" id="status" name="status">
+        </div>
+        <h4>Items</h4>
+        <table class="table" id="items_table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>HSN Code</th>
+              <th>Ordered Qty</th>
+              <th>Received Qty</th>
+              <th>Accepted Qty</th>
+              <th>Rejected Qty</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- JS populates -->
+          </tbody>
+        </table>
+        <input type="hidden" name="items_json" id="items_json">
+        <button type="submit" class="btn btn-primary" onclick="return validateGRN()">Save</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+<!-- src/templates/create_custom_voucher.html -->
+{% extends "base.html" %}
+{% block title %}Create Custom Voucher{% endblock %}
+{% block content %}
+<h2>Create Custom Voucher for {{ module.capitalize() }}</h2>
+<form method="post" action="/vouchers/create_custom">
+  <div class="mb-3">
+    <label for="name" class="form-label">Voucher Type Name</label>
+    <input type="text" class="form-control" id="name" name="name" required>
+  </div>
+  <button type="submit" class="btn btn-primary">Save</button>
+</form>
+{% endblock %}

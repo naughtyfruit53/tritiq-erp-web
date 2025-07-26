@@ -16,15 +16,97 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/users">Users</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/company">Company</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/products">Products</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/vendors">Vendors</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/customers">Customers</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/voucher_types">Voucher Types</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/crm/leads">CRM (Placeholder)</a></li>
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home &#127968;</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard &#128202;</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="masterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Master &#128194;
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="masterDropdown">
+                            <li><a class="dropdown-item" href="/company">Company Details</a></li>
+                            <li><a class="dropdown-item" href="/vendors">Vendors</a></li>
+                            <li><a class="dropdown-item" href="/products">Products</a></li>
+                            <li><a class="dropdown-item" href="/customers">Customers</a></li>
+                            <li><a class="dropdown-item" href="/default_directory">Default Directory</a></li>
+                            <li><a class="dropdown-item" href="/users">User Management</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown mega-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="vouchersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Vouchers &#128220;
+                        </a>
+                        <ul class="dropdown-menu mega-menu" aria-labelledby="vouchersDropdown">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <h5>Purchase Vouchers</h5>
+                                        <ul class="list-unstyled">
+                                            {% for voucher in request.state.grouped_vouchers.purchase %}
+                                            <li><a class="dropdown-item" href="{{ voucher.link }}">{{ voucher.name }}</a></li>
+                                            {% endfor %}
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="/vouchers/create_custom?module=purchase">Create Custom Voucher</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5>Sales Vouchers</h5>
+                                        <ul class="list-unstyled">
+                                            {% for voucher in request.state.grouped_vouchers.sales %}
+                                            <li><a class="dropdown-item" href="{{ voucher.link }}">{{ voucher.name }}</a></li>
+                                            {% endfor %}
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="/vouchers/create_custom?module=sales">Create Custom Voucher</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5>Financial Vouchers</h5>
+                                        <ul class="list-unstyled">
+                                            {% for voucher in request.state.grouped_vouchers.financial %}
+                                            <li><a class="dropdown-item" href="{{ voucher.link }}">{{ voucher.name }}</a></li>
+                                            {% endfor %}
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="/vouchers/create_custom?module=financial">Create Custom Voucher</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5>Internal Vouchers</h5>
+                                        <ul class="list-unstyled">
+                                            {% for voucher in request.state.grouped_vouchers.internal %}
+                                            <li><a class="dropdown-item" href="{{ voucher.link }}">{{ voucher.name }}</a></li>
+                                            {% endfor %}
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="/vouchers/create_custom?module=internal">Create Custom Voucher</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/stock">Inventory &#128200;</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="manufacturingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Manufacturing &#127981;
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="manufacturingDropdown">
+                            <li><a class="dropdown-item" href="/bom/create">Create BOM</a></li>
+                            <li><a class="dropdown-item" href="/work_orders/create">Create Work Order</a></li>
+                            <li><a class="dropdown-item" href="/work_orders/close">Close Work Order</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/service">Service &#128295;</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/hr_management">HR Management &#128105;&#8205;&#128188;</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="backupDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Backup & Restore &#128190;
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="backupDropdown">
+                            <li><a class="dropdown-item" href="/backup">Backup</a></li>
+                            <li><a class="dropdown-item" href="/restore">Restore</a></li>
+                            <li><a class="dropdown-item" href="/auto_backup">Auto Backup</a></li>
+                            <li><a class="dropdown-item" href="/reset">Reset Database</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>

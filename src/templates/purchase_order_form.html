@@ -1,150 +1,149 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script>{% extends "base.html" %}
-{% block title %}{% if data %}Edit{% else %}Create{% endif %} Purchase Order{% endblock %}
+<!-- src/templates/purchase_orders.html -->
+{% extends "base.html" %}
+{% block title %}Purchase Orders{% endblock %}
 {% block content %}
-<h2>{% if data %}Edit{% else %}Create{% endif %} Purchase Order</h2>
-<form method="post" action="{% if data %}/purchase_orders/{{ data.id }}{% else %}/purchase_orders{% endif %}">
-    <input type="hidden" id="items_json" name="items_json">
-    <div class="mb-3">
-        <label for="po_number" class="form-label">PO Number</label>
-        <input type="text" class="form-control" id="po_number" name="po_number" value="{{ data.po_number or '' }}" readonly>
-    </div>
-    <div class="mb-3">
-        <label for="po_date" class="form-label">PO Date</label>
-        <input type="date" class="form-control" id="po_date" name="po_date" value="{{ data.po_date or today }}">
-    </div>
-    <div class="mb-3">
-        <label for="delivery_date" class="form-label">Delivery Date</label>
-        <input type="date" class="form-control" id="delivery_date" name="delivery_date" value="{{ data.delivery_date or '' }}">
-    </div>
-    <div class="mb-3">
-        <label for="vendor_id" class="form-label">Vendor</label>
-        <select class="form-control" id="vendor_id" name="vendor_id">
-            {% for v in vendors %}
-            <option value="{{ v.id }}" {% if data and data.vendor_id == v.id %}selected{% endif %}>{{ v.name }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="mb-3">
-        <label for="payment_terms" class="form-label">Payment Terms</label>
-        <input type="text" class="form-control" id="payment_terms" name="payment_terms" value="{{ data.payment_terms or '' }}">
-    </div>
-    <table id="items_table" class="table">
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">
+      <h3>Purchase Orders List</h3>
+      <table class="table table-striped" id="purchase_orders_table">
         <thead>
-            <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Unit</th>
-                <th>Unit Price</th>
-                <th>GST Rate</th>
-                <th>Amount</th>
-                <th>Actions</th>
-            </tr>
+          <tr>
+            <th>PO Number</th>
+            <th>Vendor</th>
+            <th>Total Amount</th>
+          </tr>
         </thead>
         <tbody>
-            {% for item in data.items or [] %}
-            <tr>
-                <td><select class="form-control product-select">
-                    {% for p in products %}
-                    <option value="{{ p.id }}" {% if item.product_id == p.id %}selected{% endif %}>{{ p.name }}</option>
-                    {% endfor %}
-                </select></td>
-                <td><input type="number" class="form-control quantity" value="{{ item.quantity }}" onchange="calculateAmount(this)"></td>
-                <td><input type="text" class="form-control unit" value="{{ item.unit }}"></td>
-                <td><input type="number" class="form-control unit_price" value="{{ item.unit_price }}" onchange="calculateAmount(this)"></td>
-                <td><input type="number" class="form-control gst_rate" value="{{ item.gst_rate }}" onchange="calculateAmount(this)"></td>
-                <td><input type="number" class="form-control amount" value="{{ item.amount }}" readonly></td>
-                <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">Remove</button></td>
-            </tr>
-            {% endfor %}
+          {% for po in purchase_orders %}
+          <tr data-id="{{ po.id }}" onclick="loadForm('/purchase_orders/{{ po.id }}/edit')">
+            <td>{{ po.po_number }}</td>
+            <td>{{ po.vendor.name }}</td>  <!-- Assume vendor relation in model -->
+            <td>{{ po.total_amount }}</td>
+          </tr>
+          {% endfor %}
         </tbody>
-    </table>
-    <button type="button" class="btn btn-primary" onclick="addRow()">Add Item</button>
-    <button type="submit" class="btn btn-success">Save</button>
-</form>
-<script>
-const products = {{ products | tojson | safe }};
-let productsOptions = products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+      </table>
+      <button class="btn btn-primary" onclick="clearForm()">New Purchase Order</button>
+    </div>
+    <div class="col-md-8">
+      <h3>Purchase Order Form</h3>
+      <form id="purchase_order_form" method="post" action="/purchase_orders">
+        <input type="hidden" name="id" id="po_id">
+        <div class="mb-3">
+          <label for="po_number" class="form-label">PO Number</label>
+          <input type="text" class="form-control" id="po_number" name="po_number" required>
+        </div>
+        <div class="mb-3">
+          <label for="vendor_id" class="form-label">Vendor</label>
+          <select class="form-control" id="vendor_id" name="vendor_id" required>
+            {% for vendor in vendors %}
+            <option value="{{ vendor.id }}">{{ vendor.name }}</option>
+            {% endfor %}
+          </select>
+          <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addVendorModal">Add New Vendor</button>
+        </div>
+        <div class="mb-3">
+          <label for="po_date" class="form-label">PO Date</label>
+          <input type="date" class="form-control" id="po_date" name="po_date" value="{{ today }}" required>
+        </div>
+        <div class="mb-3">
+          <label for="delivery_date" class="form-label">Delivery Date</label>
+          <input type="date" class="form-control" id="delivery_date" name="delivery_date">
+        </div>
+        <div class="mb-3">
+          <label for="payment_terms" class="form-label">Payment Terms</label>
+          <input type="text" class="form-control" id="payment_terms" name="payment_terms">
+        </div>
+        <h4>Items</h4>
+        <table class="table" id="items_table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
+              <th>GST Rate</th>
+              <th>Amount</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- JS adds rows -->
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-secondary" onclick="addItemRow()">Add Item</button>
+        <input type="hidden" name="items_json" id="items_json">
+        <div class="mb-3">
+          <label for="total_amount" class="form-label">Total Amount</label>
+          <input type="text" class="form-control" id="total_amount" name="total_amount" readonly>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
+    </div>
+  </div>
+</div>
 
-function addRow() {
-    const tbody = document.querySelector('#items_table tbody');
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td><select class="form-control product-select">${productsOptions}</select></td>
-        <td><input type="number" class="form-control quantity" value="1" onchange="calculateAmount(this)"></td>
-        <td><input type="text" class="form-control unit" value="pcs"></td>
-        <td><input type="number" class="form-control unit_price" value="0" onchange="calculateAmount(this)"></td>
-        <td><input type="number" class="form-control gst_rate" value="18" onchange="calculateAmount(this)"></td>
-        <td><input type="number" class="form-control amount" value="0" readonly></td>
-        <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">Remove</button></td>
-    `;
-    tbody.appendChild(row);
-}
+<!-- Add Vendor Modal -->
+<div class="modal fade" id="addVendorModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Vendor</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="add_vendor_form" method="post" action="/vendors">
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="contact_no" class="form-label">Contact No</label>
+            <input type="text" class="form-control" id="contact_no" name="contact_no" required>
+          </div>
+          <!-- Add other fields as per VendorCreate schema -->
+          <button type="submit" class="btn btn-primary">Save Vendor</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
-function removeRow(btn) {
-    btn.closest('tr').remove();
-}
-
-function calculateAmount(input) {
-    const row = input.closest('tr');
-    const qty = parseFloat(row.querySelector('.quantity').value) || 0;
-    const price = parseFloat(row.querySelector('.unit_price').value) || 0;
-    const gst = parseFloat(row.querySelector('.gst_rate').value) || 0;
-    row.querySelector('.amount').value = qty * price * (1 + gst / 100);
-}
-
-document.querySelector('form').addEventListener('submit', function() {
-    const rows = document.querySelectorAll('#items_table tbody tr');
-    const items = [];
-    rows.forEach(row => {
-        items.push({
-            product_id: row.querySelector('.product-select').value,
-            quantity: parseFloat(row.querySelector('.quantity').value) || 0,
-            unit: row.querySelector('.unit').value,
-            unit_price: parseFloat(row.querySelector('.unit_price').value) || 0,
-            gst_rate: parseFloat(row.querySelector('.gst_rate').value) || 0,
-            amount: parseFloat(row.querySelector('.amount').value) || 0
-        });
-    });
-    document.getElementById('items_json').value = JSON.stringify(items);
-});
-</script>
+<!-- Similar modals for Customer and Product -->
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Product</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="add_product_form" method="post" action="/products">
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="hsn_code" class="form-label">HSN Code</label>
+            <input type="text" class="form-control" id="hsn_code" name="hsn_code" required>
+          </div>
+          <div class="mb-3">
+            <label for="unit" class="form-label">Unit</label>
+            <input type="text" class="form-control" id="unit" name="unit" required>
+          </div>
+          <div class="mb-3">
+            <label for="unit_price" class="form-label">Unit Price</label>
+            <input type="number" class="form-control" id="unit_price" name="unit_price" required>
+          </div>
+          <div class="mb-3">
+            <label for="gst_rate" class="form-label">GST Rate</label>
+            <input type="number" class="form-control" id="gst_rate" name="gst_rate" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Product</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

@@ -1,4 +1,5 @@
 src/
+│   ├── auth.py
 │   ├── config.py
 │   ├── main.py
 │   ├── api/
@@ -146,5 +147,6 @@ src/
 │   ├── static/
 │   │   ├── css/
 │   │   ├── js/
+│   │   ├── logos/
 │   ├── templates/
 │   │   ├── crm/
