@@ -11,8 +11,13 @@ import os
 
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Convert async database URLs to sync for Alembic
 if DATABASE_URL.startswith("postgresql+asyncpg://"):
     DATABASE_URL = DATABASE_URL.replace("postgresql+asyncpg://", "postgresql://")
+elif DATABASE_URL.startswith("sqlite+aiosqlite://"):
+    DATABASE_URL = DATABASE_URL.replace("sqlite+aiosqlite://", "sqlite://")
+
 DATABASE_URL = DATABASE_URL.replace('%', '%%')
 
 config = context.config
