@@ -66,7 +66,8 @@ async def root(request: Request, db: AsyncSession = Depends(get_db)):
     users = await get_users(db)
     if not users:
         return RedirectResponse("/setup")
-    return templates.TemplateResponse("login.html", {"request": request})
+    # Changed: Show home.html with logo instead of login
+    return templates.TemplateResponse("home.html", {"request": request})
 
 @web_router.get("/setup")
 async def setup_page(request: Request, db: AsyncSession = Depends(get_db)):
@@ -270,18 +271,58 @@ async def get_products_list(db: AsyncSession = Depends(get_db)):
 @web_router.get("/vendors")
 async def vendors_page(request: Request, db: AsyncSession = Depends(get_db), current_user: str = Depends(get_current_user)):
     vendors = await get_vendors(db)
-    return templates.TemplateResponse("vendors.html", {"request": request, "vendors": vendors})
+    states_dict = {
+        "Andaman and Nicobar Islands": "35",
+        "Andhra Pradesh": "37",
+        "Arunachal Pradesh": "12",
+        "Assam": "18",
+        "Bihar": "10",
+        "Chandigarh": "04",
+        "Chhattisgarh": "22",
+        "Dadra and Nagar Haveli and Daman and Diu": "26",
+        "Delhi": "07",
+        "Goa": "30",
+        "Gujarat": "24",
+        "Haryana": "06",
+        "Himachal Pradesh": "02",
+        "Jammu and Kashmir": "01",
+        "Jharkhand": "20",
+        "Karnataka": "29",
+        "Kerala": "32",
+        "Ladakh": "38",
+        "Lakshadweep": "31",
+        "Madhya Pradesh": "23",
+        "Maharashtra": "27",
+        "Manipur": "14",
+        "Meghalaya": "17",
+        "Mizoram": "15",
+        "Nagaland": "13",
+        "Odisha": "21",
+        "Other Territory": "97",
+        "Puducherry": "34",
+        "Punjab": "03",
+        "Rajasthan": "08",
+        "Sikkim": "11",
+        "Tamil Nadu": "33",
+        "Telangana": "36",
+        "Tripura": "16",
+        "Uttar Pradesh": "09",
+        "Uttarakhand": "05",
+        "West Bengal": "19"
+    }
+    states = list(states_dict.keys())
+    return templates.TemplateResponse("vendors.html", {"request": request, "vendors": vendors, "states": states})
 
 @web_router.post("/vendors")
 async def create_vendor_post(
     name: str = Form(...),
     contact_no: str = Form(...),
-    address1: str = Form(None),
+    address1: str = Form(...),
     address2: str = Form(None),
-    city: str = Form(None),
-    state: str = Form(None),
-    state_code: str = Form(None),
-    pin: str = Form(None),
+    city: str = Form(...),
+    state: str = Form(...),
+    state_code: str = Form(...),
+    pin: str = Form(...),
     gst_no: str = Form(None),
     pan_no: str = Form(None),
     email: str = Form(None),
@@ -415,7 +456,7 @@ async def update_sales_order_post(sales_order_id: int, request: Request, db: Asy
 @web_router.get("/sales_orders/{sales_order_id}/delete")
 async def delete_sales_order_get(sales_order_id: int, db: AsyncSession = Depends(get_db), current_user: str = Depends(get_current_user)):
     await delete_sales_order(db, sales_order_id)
-    return RedirectResponse("/sales_orders", status_code=303)
+    returnRedirectResponse("/sales_orders", status_code=303)
 
 @web_router.get("/sales_orders/{sales_order_id}/pdf")
 async def sales_order_pdf(sales_order_id: int, db: AsyncSession = Depends(get_db), current_user: str = Depends(get_current_user)):

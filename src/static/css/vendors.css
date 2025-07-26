@@ -1,0 +1,67 @@
+/* src/static/css/vendors.css */
+
+/* Adapted from vendors.qss */
+#titleLabel, h2 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333333;
+    padding: 10px;
+}
+
+#dialogTitleLabel, #formTitle {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333333;
+    padding: 20px;
+}
+
+#vendorTable, .table {
+    font-size: 12px;
+    border: 1px solid #cccccc;
+    background-color: #ffffff;
+}
+
+#vendorTable td, .table td {
+    padding: 5px;
+}
+
+#actionButton, button {
+    font-size: 12px;
+    padding: 5px 10px;
+    background-color: #0078d7;
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+
+#actionButton:hover, button:hover {
+    background-color: #005bb5;
+}
+
+#fieldLabel, label {
+    font-size: 12px;
+    color: #555555;
+    padding: 5px;
+}
+
+#textEntry, input {
+    font-size: 12px;
+    padding: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+}
+
+#stateCombo, select {
+    font-size: 12px;
+    padding: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+}
+
+#vendorForm {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}

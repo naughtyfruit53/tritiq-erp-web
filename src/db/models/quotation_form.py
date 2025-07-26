@@ -1,4 +1,4 @@
-# src/db/models/quote_items.py
+# src/db/models/quote_form.py
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from .base import Base
 

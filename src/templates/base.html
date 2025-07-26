@@ -9,15 +9,16 @@
     <link href="/static/css/styles.css" rel="stylesheet">
 </head>
 <body>
+    {% if current_user %}
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">ERP System</a>
+            <a class="navbar-brand" href="/home">ERP System</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Home &#127968;</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/home">Home &#127968;</a></li>
                     <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard &#128202;</a></li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="masterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -28,7 +29,6 @@
                             <li><a class="dropdown-item" href="/vendors">Vendors</a></li>
                             <li><a class="dropdown-item" href="/products">Products</a></li>
                             <li><a class="dropdown-item" href="/customers">Customers</a></li>
-                            <li><a class="dropdown-item" href="/default_directory">Default Directory</a></li>
                             <li><a class="dropdown-item" href="/users">User Management</a></li>
                         </ul>
                     </li>
@@ -111,6 +111,7 @@
             </div>
         </div>
     </nav>
+    {% endif %}
     <div class="container mt-4">
         {% block content %}{% endblock %}
     </div>

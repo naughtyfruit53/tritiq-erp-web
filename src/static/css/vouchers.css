@@ -1,0 +1,30 @@
+/* src/static/css/vouchers.css */
+h2 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333333;
+    padding: 10px;
+}
+
+.table {
+    font-size: 12px;
+    border: 1px solid #cccccc;
+    background-color: #ffffff;
+}
+
+.table td {
+    padding: 5px;
+}
+
+button {
+    font-size: 12px;
+    padding: 5px 10px;
+    background-color: #0078d7;
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #005bb5;
+}

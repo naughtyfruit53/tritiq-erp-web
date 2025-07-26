@@ -3,14 +3,21 @@
 {% block title %}Vendors{% endblock %}
 {% block content %}
 <h2>Vendors</h2>
-<table class="table">
+<table class="table" id="vendorTable">
     <thead>
         <tr>
             <th>ID</th>
             <th>Name</th>
-            <th>Contact</th>
+            <th>Contact No</th>
+            <th>Address Line 1</th>
+            <th>Address Line 2</th>
             <th>City</th>
             <th>State</th>
+            <th>State Code</th>
+            <th>PIN Code</th>
+            <th>GST No</th>
+            <th>PAN No</th>
+            <th>Email</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -20,15 +27,62 @@
             <td>{{ vendor.id }}</td>
             <td>{{ vendor.name }}</td>
             <td>{{ vendor.contact_no }}</td>
+            <td>{{ vendor.address1 }}</td>
+            <td>{{ vendor.address2 }}</td>
             <td>{{ vendor.city }}</td>
             <td>{{ vendor.state }}</td>
+            <td>{{ vendor.state_code }}</td>
+            <td>{{ vendor.pin }}</td>
+            <td>{{ vendor.gst_no }}</td>
+            <td>{{ vendor.pan_no }}</td>
+            <td>{{ vendor.email }}</td>
             <td>
-                <a href="/edit_vendor/{{ vendor.id }}" class="btn btn-sm btn-primary">Edit</a>
-                <a href="/delete_vendor/{{ vendor.id }}" class="btn btn-sm btn-danger">Delete</a>
+                <button onclick="editVendor({{ vendor.id }})">Edit</button>
+                <button onclick="deleteVendor({{ vendor.id }})">Delete</button>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-<a href="/add_vendor" class="btn btn-success">Add Vendor</a>
+<button onclick="addVendor()">Add Vendor</button>
+<button onclick="importExcel()">Import from Excel</button>
+<button onclick="exportExcel()">Export to Excel</button>
+<button onclick="downloadSample()">Download Sample Excel</button>
+
+<div id="vendorForm" style="display: none;">
+    <h3 id="formTitle">Add Vendor</h3>
+    <form id="vendorFormElement">
+        <label for="name">Name*:</label>
+        <input type="text" id="name" required><br>
+        <label for="contact_no">Contact No*:</label>
+        <input type="text" id="contact_no" required><br>
+        <label for="address1">Address Line 1*:</label>
+        <input type="text" id="address1" required><br>
+        <label for="address2">Address Line 2:</label>
+        <input type="text" id="address2"><br>
+        <label for="city">City*:</label>
+        <input type="text" id="city" required><br>
+        <label for="state">State*:</label>
+        <select id="state" required>
+            {% for state in states %}
+            <option value="{{ state }}">{{ state }}</option>
+            {% endfor %}
+        </select><br>
+        <label for="state_code">State Code*:</label>
+        <input type="text" id="state_code" readonly required><br>
+        <label for="pin">PIN Code*:</label>
+        <input type="text" id="pin" required><br>
+        <label for="gst_no">GST No:</label>
+        <input type="text" id="gst_no"><br>
+        <label for="pan_no">PAN No:</label>
+        <input type="text" id="pan_no"><br>
+        <label for="email">Email:</label>
+        <input type="email" id="email"><br>
+        <button type="button" onclick="saveVendor()">Save</button>
+        <button type="button" onclick="cancelForm()">Cancel</button>
+    </form>
+</div>
+
+<script src="/static/js/vendors.js"></script>
+<link rel="stylesheet" href="/static/css/vendors.css">
 {% endblock %}

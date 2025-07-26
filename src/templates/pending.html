@@ -1,38 +1,40 @@
 <!-- src/templates/pending.html -->
 {% extends "base.html" %}
-{% block title %}Pending{% endblock %}
+{% block title %}Pending Materials{% endblock %}
 {% block content %}
-<h2>Pending</h2>
-<form method="get" class="mb-3">
-  <div class="input-group">
-    <input type="text" name="search" class="form-control" placeholder="Search pending material" value="{{ request.query_params.search or '' }}">
-    <button type="submit" class="btn btn-primary">Search</button>
-  </div>
-</form>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>PO Number</th>
-      <th>Product</th>
-      <th>Unit</th>
-      <th>Ordered Qty</th>
-      <th>Received Qty</th>
-      <th>Pending Qty</th>
-      <th>Vendor</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for pending in pendings %}
-    <tr>
-      <td>{{ pending.po_number }}</td>
-      <td>{{ pending.product }}</td>
-      <td>{{ pending.unit }}</td>
-      <td>{{ pending.ordered_qty }}</td>
-      <td>{{ pending.received_qty }}</td>
-      <td>{{ pending.pending_qty }}</td>
-      <td>{{ pending.vendor }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
+<h2>Pending Materials</h2>
+<p>View pending material transactions, including purchase orders and goods receipt notes.</p>
+
+<!-- Search Bar -->
+<div>
+    <label for="search">Search:</label>
+    <input type="text" id="search" placeholder="Enter product or document number..." oninput="filterPending()">
+</div>
+
+<!-- Pending Table -->
+<table class="table" id="pendingTable">
+    <thead>
+        <tr>
+            <th>Document Number</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Product</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pending in pendings %}
+        <tr>
+            <td>{{ pending[0] }}</td>
+            <td>{{ pending[1] }}</td>
+            <td>{{ pending[2] }}</td>
+            <td>{{ pending[3] }}</td>
+            <td>{{ pending[4] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
+
+<script src="/static/js/pending.js"></script>
+<link rel="stylesheet" href="/static/css/pending.css">
 {% endblock %}

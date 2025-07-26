@@ -17,7 +17,7 @@ async def create_voucher_type(
     """
     Create a new voucher type record
     """
-    db_voucher_type = VoucherType(**voucher_type.model_dump())
+    db_voucher_type = VoucherType(**voucher_type.dict())
     db.add(db_voucher_type)
     await db.commit()
     await db.refresh(db_voucher_type)
@@ -78,7 +78,7 @@ async def update_voucher_type(
         return None
     
     # Update only provided fields
-    update_data = voucher_type_update.model_dump(exclude_unset=True)
+    update_data = voucher_type_update.dict(exclude_unset=True)
     stmt = (
         update(VoucherType)
         .where(VoucherType.id == voucher_type_id)

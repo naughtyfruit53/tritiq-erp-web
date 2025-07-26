@@ -1,0 +1,30 @@
+<!-- src/templates/erp/vouchers.html -->
+{% extends "base.html" %}
+{% block title %}Vouchers{% endblock %}
+{% block content %}
+<h2>Vouchers</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Module</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for voucher in voucher_types %}
+        <tr>
+            <td>{{ voucher.id }}</td>
+            <td>{{ voucher.name }}</td>
+            <td>{{ voucher.module_name }}</td>
+            <td>
+                <button onclick="viewVoucher({{ voucher.id }})">View</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script src="/static/js/vouchers.js"></script>
+<link rel="stylesheet" href="/static/css/vouchers.css">
+{% endblock %}

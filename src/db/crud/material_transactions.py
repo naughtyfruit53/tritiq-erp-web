@@ -1,8 +1,10 @@
+# src/db/crud/material_transactions.py
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 from ..models.material_transactions import MaterialTransaction
 from ..models.products import Product
+from ..schemas.material_transactions import MaterialTransactionCreate  # Assume schema exists
 
 async def get_material_transactions(db: AsyncSession, type: Optional[str] = None) -> List[dict]:
     query = select(MaterialTransaction)
@@ -25,3 +27,10 @@ async def get_material_transactions(db: AsyncSession, type: Optional[str] = None
             "remarks": t.remarks
         })
     return enriched
+
+async def create_material_transaction(db: AsyncSession, transaction: MaterialTransactionCreate) -> MaterialTransaction:
+    db_transaction = MaterialTransaction(**transaction.dict())
+    db.add(db_transaction)
+    await db.commit()
+    await db.refresh(db_transaction)
+    return db_transaction

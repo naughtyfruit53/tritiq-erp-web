@@ -1,0 +1,26 @@
+<!-- src/templates/stock.html -->
+{% extends "base.html" %}
+{% block title %}Stock{% endblock %}
+{% block content %}
+<h2>Stock</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <!-- Add more columns as needed -->
+        </tr>
+    </thead>
+    <tbody>
+        {% for stock in stocks %}
+        <tr>
+            <td>{{ stock.id }}</td>
+            <td>{{ stock.product_name }}</td>
+            <td>{{ stock.quantity }}</td>
+            <!-- Add more columns as needed -->
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

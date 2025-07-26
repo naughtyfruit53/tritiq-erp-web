@@ -1,0 +1,29 @@
+/* src/static/css/pending.css */
+
+/* Adapted from pending.qss */
+.table {
+    border: 1px solid #ccc;
+    background-color: #ffffff;
+    gridline-color: #e0e0e0;
+}
+
+.table td {
+    padding: 5px;
+}
+
+.table th {
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    padding: 5px;
+    font-weight: bold;
+}
+
+input {
+    border: 1px solid #ccc;
+    padding: 5px;
+    background-color: #ffffff;
+}
+
+label {
+    color: #333333;
+}

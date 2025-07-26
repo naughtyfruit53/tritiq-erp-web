@@ -6,6 +6,9 @@ from src.db.schemas.vendors import VendorCreate, VendorUpdate
 from typing import List
 
 async def create_vendor(db: AsyncSession, vendor: VendorCreate):
+    mandatory_fields = ["name", "contact_no", "address1", "city", "state", "state_code", "pin"]
+    if not all(getattr(vendor, field) for field in mandatory_fields):
+        raise ValueError("All mandatory fields are required")
     db_vendor = Vendor(**vendor.dict())
     db.add(db_vendor)
     await db.commit()
