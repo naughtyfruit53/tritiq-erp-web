@@ -24,6 +24,7 @@ from src.web_routes.backup_routes import backup_router
 from src.web_routes.custom_voucher_routes import custom_voucher_router
 from src.db.session import get_db_context
 from src.db.crud.voucher_types import get_voucher_types, create_voucher_type
+from src.db.crud.voucher_instances import get_voucher_instance_counts_by_types
 from src.db.schemas.voucher_types import VoucherTypeCreate
 import logging
 
@@ -58,16 +59,16 @@ async def seed_voucher_types(db):
     existing = await get_voucher_types(db)
     if not existing:
         predefined = [
-            VoucherTypeCreate(name="Sales Order", module_name="sales_order", is_default=True),
-            VoucherTypeCreate(name="Sales Invoice", module_name="sales_inv", is_default=False),
-            VoucherTypeCreate(name="Purchase Order", module_name="purchase_order", is_default=False),
-            VoucherTypeCreate(name="Purchase Invoice", module_name="purchase_inv", is_default=False),
-            VoucherTypeCreate(name="Quotation", module_name="quotation", is_default=False),
-            VoucherTypeCreate(name="Proforma Invoice", module_name="proforma_invoice", is_default=False),
-            VoucherTypeCreate(name="Credit Note", module_name="credit_note", is_default=False),
-            VoucherTypeCreate(name="GRN", module_name="grn", is_default=False),
-            VoucherTypeCreate(name="Rejection", module_name="rejection", is_default=False),
-            VoucherTypeCreate(name="Delivery Challan", module_name="delivery_challan", is_default=False),
+            VoucherTypeCreate(name="Sales Order", module_name="sales_order", category="sales", is_default=True),
+            VoucherTypeCreate(name="Sales Invoice", module_name="sales_inv", category="sales", is_default=False),
+            VoucherTypeCreate(name="Purchase Order", module_name="purchase_order", category="purchase", is_default=False),
+            VoucherTypeCreate(name="Purchase Invoice", module_name="purchase_inv", category="purchase", is_default=False),
+            VoucherTypeCreate(name="Quotation", module_name="quotation", category="sales", is_default=False),
+            VoucherTypeCreate(name="Proforma Invoice", module_name="proforma_invoice", category="sales", is_default=False),
+            VoucherTypeCreate(name="Credit Note", module_name="credit_note", category="financial", is_default=False),
+            VoucherTypeCreate(name="GRN", module_name="grn", category="purchase", is_default=False),
+            VoucherTypeCreate(name="Rejection", module_name="rejection", category="purchase", is_default=False),
+            VoucherTypeCreate(name="Delivery Challan", module_name="delivery_challan", category="sales", is_default=False),
         ]
         for vt in predefined:
             await create_voucher_type(db, vt)
@@ -83,9 +84,15 @@ async def add_voucher_categories(request: Request, call_next):
     try:
         async with get_db_context() as db:
             voucher_types = await get_voucher_types(db)
+            
+            # Get instance counts for all voucher types efficiently
+            voucher_type_ids = [vt.id for vt in voucher_types]
+            instance_counts = await get_voucher_instance_counts_by_types(db, voucher_type_ids) if voucher_type_ids else {}
+            
+            # Route mappings for predefined voucher types
             mappings = {
                 "sales_order": "/sales_orders",
-                "sales_inv": "/sales_invoices",
+                "sales_inv": "/sales_invoices", 
                 "purchase_order": "/purchase_orders",
                 "purchase_inv": "/purchase_invoices",
                 "quotation": "/quotations",
@@ -95,25 +102,59 @@ async def add_voucher_categories(request: Request, call_next):
                 "rejection": "/rejections",
                 "delivery_challan": "/delivery_challan",
             }
+            
+            # Initialize category groups
             purchase = []
             sales = []
             financial = []
             internal = []
+            
             for vt in voucher_types:
-                vt_link = mappings.get(vt.module_name, "/voucher_types")
-                vt_dict = {"name": vt.name if hasattr(vt, 'name') else vt.module_name.replace('_', ' ').capitalize(), "link": vt_link, "id": vt.id}
-                if vt.category == 'purchase':
+                # Get instance count for this voucher type
+                count = instance_counts.get(vt.id, 0)
+                
+                # Get the appropriate link
+                vt_link = mappings.get(vt.module_name, f"/voucher_instances?type_id={vt.id}")
+                
+                # Create voucher dict with instance count
+                vt_dict = {
+                    "name": vt.name if hasattr(vt, 'name') else vt.module_name.replace('_', ' ').title(),
+                    "link": vt_link,
+                    "id": vt.id,
+                    "count": count,
+                    "create_link": mappings.get(vt.module_name + "_create", f"/voucher_instances/create?type_id={vt.id}")
+                }
+                
+                # Group by category
+                category = getattr(vt, 'category', 'internal')
+                if category == 'purchase':
                     purchase.append(vt_dict)
-                elif vt.category == 'sales':
+                elif category == 'sales':
                     sales.append(vt_dict)
-                elif vt.category == 'financial':
+                elif category == 'financial':
                     financial.append(vt_dict)
-                elif vt.category == 'internal':
+                else:
                     internal.append(vt_dict)
-            grouped = {"purchase": purchase, "sales": sales, "financial": financial, "internal": internal}
+            
+            # Calculate category totals
+            grouped = {
+                "purchase": purchase, 
+                "sales": sales, 
+                "financial": financial, 
+                "internal": internal,
+                "totals": {
+                    "purchase": sum(v["count"] for v in purchase),
+                    "sales": sum(v["count"] for v in sales),
+                    "financial": sum(v["count"] for v in financial),
+                    "internal": sum(v["count"] for v in internal)
+                }
+            }
             request.state.grouped_vouchers = grouped
     except Exception as e:
         logging.error(f"Failed to load voucher categories: {e}")
-        request.state.grouped_vouchers = {"purchase": [], "sales": [], "financial": [], "internal": []}
+        request.state.grouped_vouchers = {
+            "purchase": [], "sales": [], "financial": [], "internal": [],
+            "totals": {"purchase": 0, "sales": 0, "financial": 0, "internal": 0}
+        }
     response = await call_next(request)
     return response
