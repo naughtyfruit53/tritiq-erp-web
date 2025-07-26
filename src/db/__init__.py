@@ -26,7 +26,7 @@ if not DATABASE_URL.startswith("postgresql+asyncpg://"):
 
 # Determine if local DB (no SSL) or remote (e.g., Supabase with SSL)
 connect_args = {}
-if 'localhost' not in DATABASE_URL and '127.0.0.1' not in DATABASE_URL:
+if 'localhost' not in DATABASE_URL and '127.0.0.1' not in DATABASE_URL and not DATABASE_URL.startswith("sqlite"):
     connect_args["ssl"] = supabase_ssl_context
 
 # Create async engine
